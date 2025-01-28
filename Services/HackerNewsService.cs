@@ -33,7 +33,7 @@ public class HackerNewsService(IConfiguration config, ICacheService cacheService
         }
     }
 
-    public async Task<IEnumerable<SearchItem>> GetStoryLinkPage(IEnumerable<string> storyIds, string query, int page, int pageSize)
+    public async Task<IEnumerable<SearchItem>> GetStoryLinkPage(IEnumerable<string> storyIds, string query)
     {
         List<SearchItem> stories = [];
         List<Task<string>> tasks = [];
@@ -47,9 +47,6 @@ public class HackerNewsService(IConfiguration config, ICacheService cacheService
 
         string[] queryWords = query.ToLower().Split(' ');
         SearchItem item = new() { Query = query };
-        int itemNumber = 0;
-        int firstItemNumber = (page - 1) * pageSize;
-        int lastItemNumber = page * pageSize - 1;
         foreach (string response in responses)
         {
             JObject json = JObject.Parse(response);
@@ -60,14 +57,10 @@ public class HackerNewsService(IConfiguration config, ICacheService cacheService
             bool isQueryMatch = hasValidTitle && queryWords.Any(word => storyTitle.Contains(word));
             if (isStory && hasUrl && isQueryMatch)
             {
-                itemNumber++;
-                if (itemNumber >= firstItemNumber && itemNumber <= lastItemNumber)
-                {
-                    string id = json.GetValue("id")?.ToString() ?? GetDefaultId();
-                    string link = json.GetValue("url")?.ToString() ?? "";
-                    string title = json.GetValue("title")?.ToString() ?? "";
-                    item.Items.Add(new NewsItem() { Id = id, Link = link, Title = title });
-                }
+                string id = json.GetValue("id")?.ToString() ?? GetDefaultId();
+                string link = json.GetValue("url")?.ToString() ?? "";
+                string title = json.GetValue("title")?.ToString() ?? "";
+                item.Items.Add(new NewsItem() { Id = id, Link = link, Title = title });
             }
         }
 

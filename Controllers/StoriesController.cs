@@ -33,7 +33,7 @@ namespace TomsNewsApi.Controllers
                 return [];
             }
 
-            List<SearchItem> searchResults = (List<SearchItem>) await _newsService.GetStoryLinkPage(storyIds, query, page, pageSize);
+            List<SearchItem> searchResults = (List<SearchItem>) await _newsService.GetStoryLinkPage(storyIds, query);
 
             return searchResults;
 

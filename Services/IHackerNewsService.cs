@@ -6,5 +6,5 @@ public interface IHackerNewsService
 {
     public Task<string> GetStoriesAsync();
 
-    public Task<IEnumerable<SearchItem>> GetStoryLinkPage(IEnumerable<string> storyIds, string query, int pageIndex, int pageSize);
+    public Task<IEnumerable<SearchItem>> GetStoryLinkPage(IEnumerable<string> storyIds, string query);
 }
