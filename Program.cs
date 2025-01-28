@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Serilog;
 using TomsNewsApi.Services;
 
@@ -28,6 +29,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add in-memory cache
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ICacheService, StoryCacheService>();
 
 var app = builder.Build();
 app.UseCors("AllowLocalhost4200");
