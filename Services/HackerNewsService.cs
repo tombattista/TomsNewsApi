@@ -3,9 +3,10 @@ using TomsNewsApi.Dtos;
 
 namespace TomsNewsApi.Services;
 
-public class HackerNewsService(IConfiguration config, HttpClient httpClient, ILogger<HackerNewsService> logger) : IHackerNewsService
+public class HackerNewsService(IConfiguration config, ICacheService cacheService, HttpClient httpClient, ILogger<HackerNewsService> logger) : IHackerNewsService
 {
     private readonly IConfiguration _config = config;
+    private readonly ICacheService _cacheService = cacheService;
     private readonly HttpClient _httpClient = httpClient;
     private readonly ILogger<HackerNewsService> _logger = logger;
 
@@ -39,7 +40,7 @@ public class HackerNewsService(IConfiguration config, HttpClient httpClient, ILo
         foreach (string storyId in storyIds)
         {
             string requestUrl = $"{_config.GetValue<string>("AppSettings:HNItemUri")}/{storyId}.json";
-            tasks.Add(GetResponseAsync(_httpClient, requestUrl));
+            tasks.Add(GetResponseAsync(_cacheService, _httpClient, requestUrl));
         }
 
         string[] responses = await Task.WhenAll(tasks);
@@ -75,11 +76,27 @@ public class HackerNewsService(IConfiguration config, HttpClient httpClient, ILo
         return stories;
     }
 
-    private static async Task<string> GetResponseAsync(HttpClient client, string url)
+    private static async Task<string> GetResponseAsync(ICacheService cacheService, HttpClient client, string url)
     {
+        var cachedStories = await cacheService.GetOrCreateAsync(url,
+            async () =>
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                return response;
+            });
+
+        if (cachedStories == null)
+        {
+            return "";
+        }
+
+        return await cachedStories.Content.ReadAsStringAsync();
+        /*
         HttpResponseMessage response = await client.GetAsync(url);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
+        */
     }
 
     private static string GetDefaultId()
