@@ -23,7 +23,6 @@ namespace TomsNewsApi.Controllers
         public async Task<IEnumerable<SearchItem>> Get([FromQuery] string query)
         {
             _logger.LogInformation($"Get: {query}");
-            Thread.Sleep(1000);
 
             string storyList = await _newsService.GetStoriesAsync();
             List<string>? storyIds = JsonConvert.DeserializeObject<List<string>>(storyList);
