@@ -20,7 +20,7 @@ namespace TomsNewsApi.Controllers
         /// </summary>
         /// <returns>Collection of stories, based on input query</returns>
         [HttpGet("search")]
-        public async Task<IEnumerable<SearchItem>> Get([FromQuery] string query, int page, int pageSize)
+        public async Task<IEnumerable<SearchItem>> Get([FromQuery] string query)
         {
             _logger.LogInformation($"Get: {query}");
             Thread.Sleep(1000);
